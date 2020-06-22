@@ -74,18 +74,27 @@ class Item(models.Model):
     available = models.CharField(choices=AVAILIBILITY, max_length=12)
 
 
-
-
-    class Meta:
-        ordering = ('created',)
-        index_together = (('id', 'slug'),)
+    # class Meta:
+    #     ordering = ('created',)
+    #     index_together = (('id', 'slug'),)
 
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('shop:single-product',
-                       args=[self.id, self.slug])
+        return reverse('shop:single-product',kwargs={
+            'slug': self.slug
+        })
+
+    def get_add_to_cart_url(self):
+        return reverse('shop:add-to-cart', kwargs={
+            'slug': self.slug
+        })
+
+    def get_remove_from_cart_url(self):
+        return reverse("shop:remove-from-cart", kwargs={
+            'slug': self.slug
+        })
 
     # def get_available_item(self):
     #     if self.available=True:

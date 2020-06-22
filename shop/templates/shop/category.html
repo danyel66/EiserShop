@@ -89,7 +89,8 @@
             <div class="left_sidebar_area">
               <aside class="left_widgets p_filter_widgets">
                 <div class="l_w_title">
-                  <h3>Browse Categories</h3>
+                  <h3>{% if category %}{{ category.name }}{% else %}Browse Categories
+   {% endif %}</h3>
                 </div>
                 <div class="widgets_inner">
                   {% for c in categories %}
