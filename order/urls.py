@@ -1,11 +1,11 @@
 from django.urls import path
 from .views import checkout, cart
-from shop.views import add_to_cart
+from shop.views import OrderSummaryView
 
 app_name = 'order'
 
 urlpatterns = [
         path('checkout/', checkout, name='checkout'),
-        path('cart/', cart, name='cart'),
+        path('cart/', OrderSummaryView.as_view(), name='cart'),
 
 ]

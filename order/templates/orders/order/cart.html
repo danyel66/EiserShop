@@ -38,6 +38,7 @@
                 </tr>
               </thead>
               <tbody>
+                {% for order_item in object.items.all %}
                 <tr>
                   <td>
                     <div class="media">
@@ -48,140 +49,56 @@
                         />
                       </div>
                       <div class="media-body">
-                        <p>Minimalistic shop for multipurpose use</p>
+                        <p>{{ order_item.item.name }}</p>
                       </div>
                     </div>
                   </td>
                   <td>
-                    <h5>$360.00</h5>
+                    <h5>${{ order_item.item.price }}</h5>
                   </td>
                   <td>
                     <div class="product_count">
                       <input
-                        type="text"
-                        name="qty"
-                        id="sst"
-                        maxlength="12"
-                        value="1"
-                        title="Quantity:"
-                        class="input-text qty"
-                      />
+                        type="text" name="qty" id="sst" maxlength="12" value="{{ order_item.quantity }}" title="Quantity:" class="input-text qty" />
                       <button
-                        onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;"
                         class="increase items-count"
-                        type="button"
-                      >
-                        <i class="lnr lnr-chevron-up"></i>
+                        type="button" >
+                        <a href="{% url 'shop:remove-single-item-from-cart' order_item.item.slug %}"><i class="lnr lnr-chevron-up"></i></a>
+
                       </button>
                       <button
-                        onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;"
                         class="reduced items-count"
                         type="button"
                       >
-                        <i class="lnr lnr-chevron-down"></i>
+                      <a href="{% url 'shop:add-single-item-to-cart' order_item.item.slug %}"><i class="lnr lnr-chevron-down"></i></a>
+
                       </button>
                     </div>
                   </td>
                   <td>
-                    <h5>$720.00</h5>
+                    <h5>
+                      {% if order_item.item.discount_price %}
+                        ${{ order_item.get_total_discount_item_price }}
+                        <span class="badge badge-success">Saving ${{ order_item.get_amount_saved }}</span>
+                      {% else %}
+                        ${{ order_item.get_total_item_price }}
+                      {% endif %}
+                    </h5>
+                    <a style='color: red;' href="{% url 'shop:remove-from-cart' order_item.item.slug %}">
+                      <i class="fa fa-trash float-right"></i>
+                    </a>
                   </td>
                 </tr>
-                <tr>
-                  <td>
-                    <div class="media">
-                      <div class="d-flex">
-                        <img
-                          src="{% static 'img/product/single-product/cart-1.jpg' %}"
-                          alt=""
-                        />
-                      </div>
-                      <div class="media-body">
-                        <p>Minimalistic shop for multipurpose use</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <h5>$360.00</h5>
-                  </td>
-                  <td>
-                    <div class="product_count">
-                      <input
-                        type="text"
-                        name="qty"
-                        id="sst"
-                        maxlength="12"
-                        value="1"
-                        title="Quantity:"
-                        class="input-text qty"
-                      />
-                      <button
-                        onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;"
-                        class="increase items-count"
-                        type="button"
-                      >
-                        <i class="lnr lnr-chevron-up"></i>
-                      </button>
-                      <button
-                        onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;"
-                        class="reduced items-count"
-                        type="button"
-                      >
-                        <i class="lnr lnr-chevron-down"></i>
-                      </button>
-                    </div>
-                  </td>
-                  <td>
-                    <h5>$720.00</h5>
-                  </td>
-                </tr>
-                <tr>
-                  <td>
-                    <div class="media">
-                      <div class="d-flex">
-                        <img
-                          src="{% static 'img/product/single-product/cart-1.jpg' %}"
-                          alt=""
-                        />
-                      </div>
-                      <div class="media-body">
-                        <p>Minimalistic shop for multipurpose use</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <h5>$360.00</h5>
-                  </td>
-                  <td>
-                    <div class="product_count">
-                      <input
-                        type="text"
-                        name="qty"
-                        id="sst"
-                        maxlength="12"
-                        value="1"
-                        title="Quantity:"
-                        class="input-text qty"
-                      />
-                      <button
-                        onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst )) result.value++;return false;"
-                        class="increase items-count"
-                        type="button"
-                      >
-                        <i class="lnr lnr-chevron-up"></i>
-                      </button>
-                      <button
-                        onclick="var result = document.getElementById('sst'); var sst = result.value; if( !isNaN( sst ) &amp;&amp; sst > 0 ) result.value--;return false;"
-                        class="reduced items-count"
-                        type="button"
-                      >
-                        <i class="lnr lnr-chevron-down"></i>
-                      </button>
-                    </div>
-                  </td>
-                  <td>
-                    <h5>$720.00</h5>
-                  </td>
-                </tr>
+                {% empty %}
+                  <tr>
+                      <td colspan='5'>Your cart is empty</td>
+                  </tr>
+                  <tr>
+                      <td colspan="5">
+                      <a class='main_btn float-right' href='/'>Continue shopping</a>
+                      </td>
+                  </tr>
+                {% endfor %}
                 <tr class="bottom_button">
                   <td>
                     <a class="gray_btn" href="#">Update Cart</a>
@@ -197,15 +114,23 @@
                   </td>
                 </tr>
                 <tr>
+                  {% if object.get_total %}
                   <td></td>
                   <td></td>
                   <td>
                     <h5>Subtotal</h5>
                   </td>
                   <td>
-                    <h5>$2160.00</h5>
+                    <h5>${{ object.get_total }}</h5>
                   </td>
                 </tr>
+                <tr>
+                  <td colspan="5">
+                  <a class='main_btn genric-btn primary float-right ml-2' href='/checkout/'>Proceed to checkout</a>
+                  <a class='main_btn float-right' href='/'>Continue shopping</a>
+                  </td>
+                </tr>
+                {% endif %}
                 <tr class="shipping_area">
                   <td></td>
                   <td></td>
