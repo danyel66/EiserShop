@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import CreateUserForm
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Item, Category
-from order.models import OrderItem, Order
+from order.models import OrderItem, Order, BillingAddress
 from django.utils import timezone
 
 
