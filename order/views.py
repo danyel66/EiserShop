@@ -1,11 +1,13 @@
 from django.conf import settings
 from django.contrib import messages
-from django.shortcuts import render, get_object_or_404, redirect
+from django.core.exceptions import ObjectDoesNotExist
+from django.shortcuts import render, get_object_or_404
 from shop.models import Item
 from django.utils import timezone
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import View
-from .forms import CheckoutForm
+from django.shortcuts import redirect
+from .forms import CheckoutForm, CouponForm
 from shop.views import OrderSummaryView
 from .models import Order, OrderItem, BillingAddress, Payment, Coupon
 
@@ -20,13 +22,18 @@ def cart(request):
 
 class CheckoutView(View):
     def get(self, *args, **kwargs):
-        form=CheckoutForm()
-        order = Order.objects.get(user=self.request.user, ordered=False)
-        context = {
-            'form': form,
-            'order': order
-        }
-        return render(self.request, 'orders/order/checkout.html', context)
+        try:
+            order = Order.objects.get(user=self.request.user, ordered=False)
+            form=CheckoutForm()
+            context = {
+                'form': form,
+                'couponform': CouponForm(),
+                'order': order
+            }
+            return render(self.request, 'orders/order/checkout.html', context)
+        except ObjectDoesNotExist:
+            messages.info(self.request, "You do not have an active order")
+            return redirect("order:checkout")
 
     def post(self, *args, **kwargs):
         form = CheckoutForm(self.request.POST or None)
@@ -44,7 +51,7 @@ class CheckoutView(View):
                 payment_option = form.cleaned_data.get('payment_option')
                 billing_address = BillingAddress(
                     user=self.request.user,
-                    street_address=street_address,
+                    shipping_address=shipping_address,
                     apartment_address=apartment_address,
                     country=country,
                     number=number,
@@ -60,20 +67,25 @@ class CheckoutView(View):
                 elif payment_option == 'P':
                     return redirect("order:payment", payment_option='PayPal')
                 else:
-                    message.warning(self.request, "Failed checkout")
+                    messages.warning(self.request, "Failed Checkout")
                     return redirect("order:checkout")
         except ObjectDoesNotExist:
-            messages.danger(self.request, "You do not have an active order")
+            messages.error(self.request, "You do not have an active order")
             return redirect("shop:cart")
 
 
 class PaymentView(View):
     def get(self, *args, **kwargs):
         order = Order.objects.get(user=self.request.user, ordered=False)
-        context = {
-            'order': order
-        }
-        return render(self.request, "orders/order/payment.html", context)
+        if order.billing_address:
+            context = {
+                'order': order,
+                # 'DISPLAY_COUPON_FORM': False
+            }
+            return render(self.request, "orders/order/payment.html", context)
+        else:
+            messages.warning(self.request, "You have not added a billing address")
+            return redirect('order:checkout')
 
     def post(self, *args, **kwargs):
         order = Order.objects.get(user=self.request.user, ordered=False)
@@ -154,18 +166,20 @@ def get_coupon(request, code):
         return coupon
     except ObjectDoesNotExist:
         messages.info(request, "This coupon does not exist")
-        return redirect("FrontEnd:checkout")
+        return redirect("order:checkout")
 
 
-def add_coupon(request, code):
-    try:
-        order = Order.objects.get(user=request.user, ordered=False)
-        order.coupon = get_coupon(request, code)
-        order.save()
-        messages.success(request, "Successfully added coupon")
-        return redirect("FrontEnd:checkout")
-
-
-    except ObjectDoesNotExist:
-        messages.info(request, "You do not have an active order")
-        return redirect("FrontEnd:checkout")
+class AddCouponView(View):
+    def post(self, *args, **kwargs):
+        form = CouponForm(request.POST or None)
+        if form.is_valid():
+            try:
+                code = form.cleaned_data.get('code')
+                order = Order.objects.get(user=request.user, ordered=False)
+                order.coupon = get_coupon(request, code)
+                order.save()
+                messages.success(request, "Successfully added coupon")
+                return redirect("order:checkout")
+            except ObjectDoesNotExist:
+                messages.info(request, "You do not have an active order")
+                return redirect("order:checkout")

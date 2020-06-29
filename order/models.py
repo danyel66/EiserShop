@@ -54,12 +54,14 @@ class Order(models.Model):
         total = 0
         for order_item in self.items.all():
             total += order_item.get_final_price()
+        if self.coupon:
+            total -= self.coupon.amount
         return total
 
 class BillingAddress(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
-    street_address = models.CharField(max_length=100)
+    shipping_address = models.CharField(max_length=100)
     apartment_address = models.CharField(max_length=100)
     country = CountryField(multiple=True)
     number = models.IntegerField()

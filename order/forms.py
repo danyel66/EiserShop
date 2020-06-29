@@ -11,13 +11,9 @@ PAYMENT_CHOICES = (
 class CheckoutForm(forms.Form):
     shipping_address = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'id': 'add1',
-        'name': 'add1'
     }))
     apartment_address = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'id': 'add2',
-        'name': 'add2'
     }))
     country = CountryField(blank_label='Select Country').formfield(
         widget=CountrySelectWidget(attrs={
@@ -25,22 +21,23 @@ class CheckoutForm(forms.Form):
         }))
     number = forms.IntegerField(widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'id': 'number',
-        'name': 'number'
 
     }))
     city = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'id': 'city',
-        'name': 'city'
     }))
     zip = forms.CharField(widget=forms.TextInput(attrs={
         'class': 'form-control',
-        'id': 'zip',
-        'placeholder': 'Postcode/ZIP'
     }))
     same_shipping_address = forms.BooleanField(required=False, widget=forms.CheckboxInput())
     save_info = forms.BooleanField(required=False)
     payment_option = forms.ChoiceField(
         widget=forms.RadioSelect, choices=PAYMENT_CHOICES
     )
+
+
+class CouponForm(forms.Form):
+    code = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'contact_form',
+        'placeholder': 'Coupon Code'
+    }))

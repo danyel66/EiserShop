@@ -163,6 +163,14 @@ label {
                 </a>
               </li>
               {% endfor %}
+              {% if order.coupon %}
+              <li>
+                <a class="text-success">Promo code
+                  <span class="last">-${{ order.coupon.amount }}</span>
+                </a>
+                <span class="my-0">{{ order.coupon.code }}</span>
+              </li>
+              {% endif %}
             </ul>
             <ul class="list list_2">
               <li>
