@@ -1,6 +1,7 @@
 from django import forms
 from django_countries.fields import CountryField
 from django_countries.widgets import CountrySelectWidget
+from django.contrib.auth.models import User
 
 PAYMENT_CHOICES = (
     ('S', 'Stripe'),
@@ -38,7 +39,7 @@ class CheckoutForm(forms.Form):
         'id': 'zip',
         'placeholder': 'Postcode/ZIP'
     }))
-    same_shipping_address = forms.BooleanField(required=False)
+    same_shipping_address = forms.BooleanField(required=False, widget=forms.CheckboxInput())
     save_info = forms.BooleanField(required=False)
     payment_option = forms.ChoiceField(
         widget=forms.RadioSelect, choices=PAYMENT_CHOICES

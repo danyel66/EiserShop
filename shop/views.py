@@ -10,6 +10,43 @@ from .models import Item, Category
 from order.models import OrderItem, Order, BillingAddress
 from django.utils import timezone
 
+def index(request):
+    context = {
+        'items': Item.objects.filter(feature=True)
+    }
+    return render(request, 'shop/index.html', context)
+	
+
+def category(request, category_slug=None):
+    category = None
+    categories = Category.objects.all()
+    products = Item.objects.all()
+    if category_slug:
+        category = get_object_or_404(Category, slug=category_slug)
+        products = products.filter(category=category)
+    return render(request, 'shop/category.html',
+                            {'category': category,
+                             'categories': categories,
+                             'products': products})
+
+def single_product(request, slug):
+    product = get_object_or_404(Item, slug=slug)
+    return render(request, 'shop/single-product.html',
+                            {'product': product})
+
+
+class OrderSummaryView(LoginRequiredMixin, View):
+	def get(self, *args, **kwargs):
+		try:
+			order = Order.objects.get(user=self.request.user, ordered=False)
+			context = {
+				'object': order
+			}
+			return render(self.request, 'orders/order/cart.html', context)
+		except ObjectDoesNotExist:
+			messages.warning(self.request, 'You do not have an active order')
+			return redirect('/')
+
 
 def registerPage(request):
 	if request.user.is_authenticated:
@@ -57,49 +94,7 @@ def logoutUser(request):
 	logout(request)
 	return redirect('shop:login')
 
-def index(request):
-    context = {
-        'items': Item.objects.filter(feature=True)
-    }
-    return render(request, 'shop/index.html', context)
 
-def category(request, category_slug=None):
-    category = None
-    categories = Category.objects.all()
-    products = Item.objects.all()
-    if category_slug:
-        category = get_object_or_404(Category, slug=category_slug)
-        products = products.filter(category=category)
-    return render(request, 'shop/category.html',
-                            {'category': category,
-                             'categories': categories,
-                             'products': products})
-
-
-def contact(request):
-    return render(request, 'shop/contact.html')
-
-
-@login_required
-def single_product(request, slug):
-    product = get_object_or_404(Item, slug=slug)
-    return render(request, 'shop/single-product.html',
-                            {'product': product})
-
-class OrderSummaryView(LoginRequiredMixin, View):
-	def get(self, *args, **kwargs):
-		try:
-			order = Order.objects.get(user=self.request.user, ordered=False)
-			context = {
-				'object': order
-			}
-			return render(self.request, 'orders/order/cart.html', context)
-		except ObjectDoesNotExist:
-			messages.warning(self.request, 'You do not have an active order')
-			return redirect('/')
-
-
-@login_required
 def add_to_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
     order_item, created = OrderItem.objects.get_or_create(
@@ -128,7 +123,6 @@ def add_to_cart(request, slug):
         return redirect("shop:single-product", slug=slug)
 
 
-@login_required
 def remove_from_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
     order_qs = Order.objects.filter(
@@ -155,7 +149,6 @@ def remove_from_cart(request, slug):
         return redirect("shop:single-product", slug=slug)
 
 
-@login_required
 def add_single_item_to_cart(request, slug):
     item = get_object_or_404(Item, slug=slug)
     order_item, created = OrderItem.objects.get_or_create(
@@ -212,6 +205,10 @@ def remove_single_item_from_cart(request, slug):
     else:
         messages.info(request, "You do not have an active order")
         return redirect("shop:single-product", slug=slug)
+
+
+def contact(request):
+    return render(request, 'shop/contact.html')
 
 
 def elements(request):

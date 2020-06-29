@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'blog',
     'order',
-    'shop'
+    'shop',
+    'django_countries',
+
 ]
 
 MIDDLEWARE = [
