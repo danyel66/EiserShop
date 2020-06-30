@@ -41,3 +41,15 @@ class CouponForm(forms.Form):
         'class': 'contact_form',
         'placeholder': 'Coupon Code'
     }))
+
+
+class RefundForm(forms.Form):
+    ref_code = forms.CharField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+    }))
+    email = forms.EmailField(widget=forms.TextInput(attrs={
+        'class': 'form-control',
+    }))
+    memssage = forms.CharField(widget=forms.Textarea(attrs={
+        'class': 'form-control',
+    }))

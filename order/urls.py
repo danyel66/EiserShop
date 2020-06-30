@@ -1,5 +1,5 @@
 from django.urls import path
-from order.views import CheckoutView, PaymentView, AddCouponView
+from order.views import CheckoutView, PaymentView, AddCouponView, RequestRefundView
 from shop.views import OrderSummaryView
 
 
@@ -10,6 +10,6 @@ urlpatterns = [
         path('cart/', OrderSummaryView.as_view(), name='cart'),
         path('add-coupon/', AddCouponView.as_view(), name='add-coupon'),
         path('payment/<payment_option>/', PaymentView.as_view(), name='payment'),
-
+        path('request-refund/', RequestRefundView.as_view(), name='request-refund'),
 
 ]
