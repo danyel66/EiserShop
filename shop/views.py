@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import CreateUserForm
 from django.shortcuts import render, get_object_or_404, redirect
 from .models import Item, Category
-from order.models import OrderItem, Order, BillingAddress
+from order.models import OrderItem, Order, Address
 from django.utils import timezone
 
 def index(request):
@@ -15,7 +15,7 @@ def index(request):
         'items': Item.objects.filter(feature=True)
     }
     return render(request, 'shop/index.html', context)
-	
+
 
 def category(request, category_slug=None):
     category = None

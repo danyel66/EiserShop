@@ -5,6 +5,11 @@ from shop.models import Item
 from django_countries.fields import CountryField
 
 
+ADDERESS_CHOICES = (
+    ('B', 'Billing'),
+    ('S', 'Shipping')
+)
+
 class OrderItem(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
@@ -39,7 +44,10 @@ class Order(models.Model):
     ordered_date = models.DateTimeField()
     ordered = models.BooleanField(default=False)
     billing_address = models.ForeignKey(
-        'BillingAddress', on_delete=models.SET_NULL, blank=True, null=True
+        'Address', related_name='billing_address', on_delete=models.SET_NULL, blank=True, null=True
+    )
+    shipping_address = models.ForeignKey(
+        'Address', related_name='shipping_address', on_delete=models.SET_NULL, blank=True, null=True
     )
     payment = models.ForeignKey(
         'Payment', on_delete=models.SET_NULL, blank=True, null=True
@@ -63,18 +71,24 @@ class Order(models.Model):
             total -= self.coupon.amount
         return total
 
-class BillingAddress(models.Model):
+class Address(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL,
                              on_delete=models.CASCADE)
-    shipping_address = models.CharField(max_length=100)
+    street_address = models.CharField(max_length=100)
     apartment_address = models.CharField(max_length=100)
     country = CountryField(multiple=True)
     number = models.IntegerField()
     city = models.CharField(max_length=100)
     zip = models.CharField(max_length=100)
+    address_type = models.CharField(max_length=1, choices=ADDERESS_CHOICES)
+    default = models.BooleanField(default=False)
+
 
     def __str__(self):
         return self.user.username
+
+    class Meta:
+        verbose_name_plural = 'Addresses'
 
 
 class Payment(models.Model):
