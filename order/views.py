@@ -98,17 +98,15 @@ class CheckoutView(View):
                     shipping_country = form.cleaned_data.get(
                         'shipping_country')
                     shipping_city = form.cleaned_data.get('shipping_city')
-                    shipping_number = form.cleaned_data.get('shipping_number')
                     shipping_zip = form.cleaned_data.get('shipping_zip')
 
-                    if is_valid_form([shipping_address1, shipping_country, shipping_city, shipping_number,shipping_zip]):
+                    if is_valid_form([shipping_address1, shipping_country, shipping_city, shipping_zip]):
                         shipping_address = Address(
                             user=self.request.user,
                             street_address=shipping_address1,
                             apartment_address=shipping_address2,
                             country=shipping_country,
                             city=shipping_city,
-                            number=shipping_number,
                             zip=shipping_zip,
                             address_type='S'
                         )
@@ -165,17 +163,15 @@ class CheckoutView(View):
                     billing_country = form.cleaned_data.get(
                         'billing_country')
                     billing_city = form.cleaned_data.get('billing_city')
-                    billing_number = form.cleaned_data.get('billing_number')
                     billing_zip = form.cleaned_data.get('billing_zip')
 
-                    if is_valid_form([billing_address1, billing_country, billing_city, billing_number, billing_zip]):
+                    if is_valid_form([billing_address1, billing_country, billing_city, billing_zip]):
                         billing_address = Address(
                             user=self.request.user,
                             street_address=billing_address1,
                             apartment_address=billing_address2,
                             country=billing_country,
                             city=billing_city,
-                            number=billing_number,
                             zip=billing_zip,
                             address_type='B'
                         )
@@ -197,11 +193,11 @@ class CheckoutView(View):
                 payment_option = form.cleaned_data.get('payment_option')
 
                 if payment_option == 'S':
-                    return redirect("order:payment", payment_option='Stripe')
+                    return redirect("order:payment", payment_option='stripe')
                 elif payment_option == 'P':
-                    return redirect("order:payment", payment_option='PayPal')
+                    return redirect("order:payment", payment_option='paypal')
                 else:
-                    messages.warning(self.request, "Failed Checkout")
+                    messages.warning(self.request, "Invalid payment option selected")
                     return redirect("order:checkout")
         except ObjectDoesNotExist:
             messages.warning(self.request, "You do not have an active order")

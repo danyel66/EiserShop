@@ -16,7 +16,6 @@ class CheckoutForm(forms.Form):
         widget=CountrySelectWidget(attrs={
             'class': 'country_select d-block w-100'
         }))
-    shipping_number = forms.IntegerField(required=False)
     shipping_city = forms.CharField(required=False)
     shipping_zip = forms.CharField(required=False)
 
@@ -27,7 +26,6 @@ class CheckoutForm(forms.Form):
         widget=CountrySelectWidget(attrs={
             'class': 'custom-select d-block w-100',
         }))
-    billing_number = forms.IntegerField(required=False)
     billing_city = forms.CharField(required=False)
     billing_zip = forms.CharField(required=False)
 
@@ -36,7 +34,7 @@ class CheckoutForm(forms.Form):
     use_default_shipping = forms.BooleanField(required=False)
     set_default_billing = forms.BooleanField(required=False)
     use_default_billing = forms.BooleanField(required=False)
-    
+
     payment_option = forms.ChoiceField(
         widget=forms.RadioSelect, choices=PAYMENT_CHOICES
     )
